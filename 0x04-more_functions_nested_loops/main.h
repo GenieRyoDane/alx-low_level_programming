@@ -1,3 +1,4 @@
+#include "_putchar.c"
 int _putchar(char c);
 int main(void);
 int _isupper(int c);
