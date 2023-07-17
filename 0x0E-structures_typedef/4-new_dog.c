@@ -1,66 +1,89 @@
 #include "dog.h"
 #include <stdlib.h>
+
 /**
- * _strdup - returns a pointer to a newly allocated space in memory, which
- * contains a copy of the string given as a parameter.
- * @str: string to copy
+ * dup_string - Duplicates a string passed into a newly allocated space in
+ * memory
+ * @s: Pointer to the first character in the source string
  *
- * Return: Pointer
+ * Return: Pointer to the first character in the newly allocated and copied
+ * string
  */
-char *_strdup(char *str)
+char *dup_string(char *s)
 {
-	int l, i;
-	char *s;
+	int len, i;
+	char *ret;
 
-	if (str == NULL)
-		return (0);
+	for (len = 0; s[len]; len++)
+		;
 
-	l = 0;
-	while (*(str + l))
-		l++;
+	ret = malloc(sizeof(char) * (len + 1));
+	if (ret == NULL)
+		return (NULL);
 
-	s = malloc(sizeof(char) * l + 1);
+	for (i = 0; s[i]; i++)
+		ret[i] = s[i];
+	ret[i] = '\0';
 
-	if (s == 0)
-		return (0);
-
-	for (i = 0; i <= l; i++)
-	{
-		*(s + i) = *(str + i);
-	}
-	return (s);
+	return (ret);
 }
+
 /**
- * new_dog - creates a new dog
- * @name: name of dog
- * @age: age of dog
- * @owner: owner of dog
+ * new_dog - Makes a new dog with the given parameters
+ * @name: Pointer to the first character of the string of the name of the dog
+ * to be created
+ * @age: Age of the dog to be created as a float
+ * @owner: Pointer to the first character of the string of the owner of the dog
+ * to be created
  *
- * Return: On success 1.
- * On error, -1 is returned, and errno is set appropriately.
+ * Return: Pointer to the new `dog_t` with all of the given attributes
  */
 dog_t *new_dog(char *name, float age, char *owner)
 {
-	dog_t *new_dog;
+	char *tname, *towner;
+	dog_t *ret;
 
-	new_dog = malloc(sizeof(struct dog));
+	if (name == NULL || owner == NULL)
+		return (NULL);
 
-	if (new_dog == 0 || name == 0 || owner == 0)
-		return (0);
+	ret = malloc(sizeof(dog_t));
+	if (ret == NULL)
+		return (NULL);
+	ret->age = age;
 
-	new_dog->name = _strdup(name);
-	if (new_dog->name == 0)
+	tname = dup_string(name);
+	if (tname == NULL)
 	{
-		free(new_dog);
-		return (0);
+		free_dog(ret);
+		return (NULL);
 	}
-	new_dog->age = age;
-	new_dog->owner = _strdup(owner);
-	if (new_dog->owner == 0)
-		{
-			free(new_dog);
-			free(new_dog->name);
-			return (0);
-		}
-	return (new_dog);
+	ret->name = tname;
+
+	towner = dup_string(owner);
+	if (towner == NULL)
+	{
+		free_dog(ret);
+		return (NULL);
+	}
+	ret->owner = towner;
+
+	return (ret);
+}
+
+/**
+ * free_dog - Frees all memory allocated by a dog_t struct
+ * @d: Pointer to the struct to be freed
+ */
+void free_dog(dog_t *d)
+{
+	if (d == NULL)
+		return;
+
+	if (d->name != NULL)
+		free(d->name);
+
+	if (d->owner != NULL)
+		free(d->owner);
+
+	free(d);
 }
